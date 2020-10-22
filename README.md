@@ -29,7 +29,7 @@ Au préalable, vous devrez avoir installé localement sur votre ordinateur :
 ### Installation et connexion de la Base De Données MongoDB Atlas ###
 
 - Créez un compte sur https://www.mongodb.com avec un utilisateur.
-- Remplacez `/*'connection link mongodb',*/` dans le fichier `app.js` du backend, à la ligne 13, par votre lien de connexion.
+- Remplacez `MDB_LINK` dans le fichier `app.js` du backend, à la ligne 17, par votre lien de connexion.
 
 
 ### Fonctionnalités des serveurs ###

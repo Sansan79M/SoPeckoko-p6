@@ -8,9 +8,13 @@ const userRoutes = require('./routes/user.js');
 
 const app = express();
 
+//Cryptage du lien mongoDB
+require('dotenv').config()
+const MDB_LINK = process.env.MDB_LINK;
+
 //API connectée à la base de donnée
-mongoose.connect 
-  (/*'connection link mongodb',*/
+mongoose.connect
+  (MDB_LINK,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true

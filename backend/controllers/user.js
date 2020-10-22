@@ -3,6 +3,10 @@ const jwt = require('jsonwebtoken');
 const xss = require('xss');
 const User = require('../models/User.js');
 
+//Cryptage du token
+require('dotenv').config()
+const TOKEN = process.env.TOKEN;
+
 //Création d'un nouveau compte utilisateur
 exports.signup = (req, res, next) => {
   if (!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9]{8,})$/.test(req.body.password)) {
@@ -38,7 +42,7 @@ exports.login = (req, res, next) => {
             userId: user._id,
             token: jwt.sign(
               { userId: user._id },
-              'RANDOM_TOKEN_SECRET',
+              TOKEN,
               { expiresIn: '6h' }
             )
           });

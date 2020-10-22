@@ -118,7 +118,6 @@ export class SaucesService {
         {
           userId: this.auth.getUserId(),
           like: like ? 1 : 0,
-          type: "like"//Ajout type pour faire fonctionner les likes
         })
         .subscribe(
           (response: { message: string }) => {
@@ -138,7 +137,6 @@ export class SaucesService {
         {
           userId: this.auth.getUserId(),
           like: dislike ? -1 : 0,
-          type: "dislike" //Ajout type pour faire fonctionner les dislikes
         })
         .subscribe(
           (response: { message: string }) => {
