@@ -33,14 +33,23 @@ exports.getOneSauce = (req, res, next) => {
 
 //Met à jour la sauce et son image via son ID
 exports.modifySauce = (req, res, next) => {
-    const sauceObject = req.file ?
-        {
-            ...JSON.parse(req.body.sauce),
-            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-        } : { ...req.body };
-    Sauce.updateOne({ _id: req.params.id, userId: req.body.userId }, { ...sauceObject, _id: req.params.id })
-        .then(() => res.status(200).json({ message: 'La sauce a été modifiée !' }))
-        .catch(error => res.status(400).json({ error }));
+    Sauce.findById(req.params.id, (err, sauce) => {
+        if (err) {
+            return res.status(500).json({ err });
+        }
+        if ((userId => userId == req.body.userId)) {
+            const sauceObject = req.file ?
+                {
+                    ...JSON.parse(req.body.sauce),
+                    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+                } : { ...req.body };
+            Sauce.updateOne({ _id: req.params.id, userId: req.body.userId }, { ...sauceObject, _id: req.params.id })
+                .then(() => res.status(200).json({ message: 'La sauce a été modifiée !' }))
+                .catch(error => res.status(400).json({ error }));
+        } else {
+            return res.status(403).json({ error: 'Vous n\'êtes pas autorisé à supprimer la sauce' });
+        }
+    });
 }
 
 //Supprime la sauce et son ID
