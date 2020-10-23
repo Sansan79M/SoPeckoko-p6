@@ -47,7 +47,7 @@ exports.modifySauce = (req, res, next) => {
                 .then(() => res.status(200).json({ message: 'La sauce a été modifiée !' }))
                 .catch(error => res.status(400).json({ error }));
         } else {
-            return res.status(403).json({ error: 'Vous n\'êtes pas autorisé à supprimer la sauce' });
+            return res.status(403).json({ error: 'Vous n\'êtes pas autorisé à modifier la sauce' });
         }
     });
 }
