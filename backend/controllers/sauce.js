@@ -35,6 +35,8 @@ exports.getOneSauce = (req, res, next) => {
 exports.modifySauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
         .then((sauce) => {
+            console.log('Modify : sauce.userId : ' + sauce.userId); //string ok
+            console.log('Modify : req.body.userId : ' + req.body.userId); //string ok
             if (sauce.userId === req.body.userId) {
                 const sauceObject = req.file ?
                     {
@@ -54,16 +56,19 @@ exports.modifySauce = (req, res, next) => {
 exports.deleteSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
         .then((sauce) => {
-            if (sauce.userId !== req.body.userId) {
-                const filename = sauce.imageUrl.split('/images/')[1];
-                fs.unlink(`images/${filename}`, () => {
-                    Sauce.deleteOne({ _id: req.params.id })
-                        .then(() => res.status(200).json({ message: 'La sauce a été supprimée !' }))
-                        .catch(error => res.status(400).json({ error }));
-                });
-            } else {
-                return res.status(403).json({ error: 'Vous n\'êtes pas autorisé à supprimer la sauce' });
-            }
+            //La condition est impossible à vérifier, car le delete dans le frontend ne renvoie pas l'ID de l'utilisateur
+            console.log('Delete : sauce.userId : ' + sauce.userId); //string ok
+            console.log('Delete : req.body.userId : ' + req.body.userId); //undefined
+            //if (sauce.userId === req.body.userId) {
+            const filename = sauce.imageUrl.split('/images/')[1];
+            fs.unlink(`images/${filename}`, () => {
+                Sauce.deleteOne({ _id: req.params.id })
+                    .then(() => res.status(200).json({ message: 'La sauce a été supprimée !' }))
+                    .catch(error => res.status(400).json({ error }));
+            });
+            /*} else {
+                 return res.status(403).json({ error: 'Vous n\'êtes pas autorisé à supprimer la sauce' });
+             }*/
         });
 };
 
@@ -72,9 +77,14 @@ exports.deleteSauce = (req, res, next) => {
 exports.likeSauce = (req, res, next) => {
     switch (req.body.like) {
         case 1:
+            //L'utilisateur ajoute son like
             Sauce.findOne({ _id: req.params.id })
                 .then((sauce) => {
-                    if (sauce.userId !== req.body.usersLiked) {
+                    console.log('1 like : sauce.userId : ' + sauce.userId); //string ok
+                    console.log('1 like : req.body.userId : ' + req.body.userId); //string ok
+                    console.log('1 like : sauce.usersLiked : ' + sauce.usersLiked); //vide ou d'autres userId
+                    console.log('1 like : req.body.usersLiked : ' + req.body.usersLiked); //undefined
+                    if (req.body.userId !== sauce.usersLiked) {
                         Sauce.updateOne({ _id: req.params.id }, {
                             $inc: { likes: 1 }, //incrémente de 1 le nombre de likes
                             $push: { usersLiked: req.body.userId } //ajoute l'userId aux likes 
@@ -88,6 +98,12 @@ exports.likeSauce = (req, res, next) => {
         case 0:
             Sauce.findOne({ _id: req.params.id })
                 .then((sauce) => {
+
+                    //L'utilisateur enlève son like
+                    console.log('-1 like : sauce.userId : ' + sauce.userId); //string ok
+                    console.log('-1 like : req.body.userId : ' + req.body.userId); //string ok
+                    console.log('-1 like : sauce.usersLiked : ' + sauce.usersLiked); // string ok
+                    console.log('-1 like : req.body.usersLiked : ' + req.body.usersLiked); //undefined
                     if (sauce.usersLiked.find(user => user === req.body.userId)) {
                         Sauce.updateOne({ _id: req.params.id }, {
                             $inc: { likes: -1 }, //décrémente de 1 le nombre de likes
@@ -96,6 +112,12 @@ exports.likeSauce = (req, res, next) => {
                             .then(() => res.status(200).json({ message: "L'utilisateur annule son like" }))
                             .catch(error => res.status(400).json({ error }));
                     } else {
+
+                        //L'utilisateur enlève son dislike
+                        console.log('-1 dislike : sauce.userId : ' + sauce.userId); //string ok
+                        console.log('-1 dislike : req.body.userId : ' + req.body.userId); //string ok
+                        console.log('-1 dislike : sauce.usersDisliked : ' + sauce.usersDisliked); //string ok
+                        console.log('-1 dislike : req.body.usersDisliked : ' + req.body.usersDisliked); //undefined
                         if (sauce.usersDisliked.find(user => user === req.body.userId)) {
                             Sauce.updateOne({ _id: req.params.id }, {
                                 $inc: { dislikes: -1 }, //décrémente de 1 le nombre de dislikes
@@ -109,9 +131,14 @@ exports.likeSauce = (req, res, next) => {
             break;
 
         case -1:
+            //L'utilisateur ajoute son dislike
             Sauce.findOne({ _id: req.params.id })
                 .then((sauce) => {
-                    if (sauce.userId !== req.body.usersDisliked) {
+                    console.log('1 dislike : sauce.userId : ' + sauce.userId); //string ok
+                    console.log('1 dislike : req.body.userId : ' + req.body.userId); //string ok
+                    console.log('1 dislike : sauce.usersDisliked : ' + sauce.usersDisliked); //vide ou d'autres userId
+                    console.log('1 dislike : req.body.usersDisliked : ' + req.body.usersDisliked); //undefined
+                    if (req.body.userId !== sauce.usersDisliked) {
                         Sauce.updateOne({ _id: req.params.id }, {
                             $inc: { dislikes: 1 }, //incrémente de 1 le nombre de dislikes
                             $push: { usersDisliked: req.body.userId } //ajoute l'userId aux dislikes 
