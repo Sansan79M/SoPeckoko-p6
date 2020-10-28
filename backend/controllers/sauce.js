@@ -78,21 +78,12 @@ exports.likeSauce = (req, res, next) => {
     switch (req.body.like) {
         case 1:
             //L'utilisateur ajoute son like
-            Sauce.findOne({ _id: req.params.id })
-                .then((sauce) => {
-                    console.log('1 like : sauce.userId : ' + sauce.userId); //string ok
-                    console.log('1 like : req.body.userId : ' + req.body.userId); //string ok
-                    console.log('1 like : sauce.usersLiked : ' + sauce.usersLiked); //vide ou d'autres userId
-                    console.log('1 like : req.body.usersLiked : ' + req.body.usersLiked); //undefined
-                    if (req.body.userId !== sauce.usersLiked) {
-                        Sauce.updateOne({ _id: req.params.id }, {
-                            $inc: { likes: 1 }, //incrémente de 1 le nombre de likes
-                            $push: { usersLiked: req.body.userId } //ajoute l'userId aux likes 
-                        })
-                            .then(() => res.status(200).json({ message: "L'utilisateur ajoute son like" }))
-                            .catch(error => res.status(400).json({ error }));
-                    }
-                });
+            Sauce.updateOne({ _id: req.params.id }, {
+                $inc: { likes: 1 }, //incrémente de 1 le nombre de likes
+                $push: { usersLiked: req.body.userId } //ajoute l'userId aux likes 
+            })
+                .then(() => res.status(200).json({ message: "L'utilisateur ajoute son like" }))
+                .catch(error => res.status(400).json({ error }));
             break;
 
         case 0:
@@ -100,53 +91,35 @@ exports.likeSauce = (req, res, next) => {
                 .then((sauce) => {
 
                     //L'utilisateur enlève son like
-                    console.log('-1 like : sauce.userId : ' + sauce.userId); //string ok
-                    console.log('-1 like : req.body.userId : ' + req.body.userId); //string ok
-                    console.log('-1 like : sauce.usersLiked : ' + sauce.usersLiked); // string ok
-                    console.log('-1 like : req.body.usersLiked : ' + req.body.usersLiked); //undefined
-                    if (sauce.usersLiked.find(user => user === req.body.userId)) {
+                    if (sauce.usersLiked.findIndex(userId => userId === req.body.userId) > -1) {
                         Sauce.updateOne({ _id: req.params.id }, {
                             $inc: { likes: -1 }, //décrémente de 1 le nombre de likes
                             $pull: { usersLiked: req.body.userId } //retire l'userId des likes
                         })
                             .then(() => res.status(200).json({ message: "L'utilisateur annule son like" }))
                             .catch(error => res.status(400).json({ error }));
+                            
                     } else {
 
                         //L'utilisateur enlève son dislike
-                        console.log('-1 dislike : sauce.userId : ' + sauce.userId); //string ok
-                        console.log('-1 dislike : req.body.userId : ' + req.body.userId); //string ok
-                        console.log('-1 dislike : sauce.usersDisliked : ' + sauce.usersDisliked); //string ok
-                        console.log('-1 dislike : req.body.usersDisliked : ' + req.body.usersDisliked); //undefined
-                        if (sauce.usersDisliked.find(user => user === req.body.userId)) {
-                            Sauce.updateOne({ _id: req.params.id }, {
-                                $inc: { dislikes: -1 }, //décrémente de 1 le nombre de dislikes
-                                $pull: { usersDisliked: req.body.userId } //retire l'userId des dislikes
-                            })
-                                .then(() => res.status(200).json({ message: "L'utilisateur annule son dislike" }))
-                                .catch(error => res.status(400).json({ error }));
-                        }
+                        Sauce.updateOne({ _id: req.params.id }, {
+                            $inc: { dislikes: -1 }, //décrémente de 1 le nombre de dislikes
+                            $pull: { usersDisliked: req.body.userId } //retire l'userId des dislikes
+                        })
+                            .then(() => res.status(200).json({ message: "L'utilisateur annule son dislike" }))
+                            .catch(error => res.status(400).json({ error }));
                     }
                 });
             break;
 
         case -1:
             //L'utilisateur ajoute son dislike
-            Sauce.findOne({ _id: req.params.id })
-                .then((sauce) => {
-                    console.log('1 dislike : sauce.userId : ' + sauce.userId); //string ok
-                    console.log('1 dislike : req.body.userId : ' + req.body.userId); //string ok
-                    console.log('1 dislike : sauce.usersDisliked : ' + sauce.usersDisliked); //vide ou d'autres userId
-                    console.log('1 dislike : req.body.usersDisliked : ' + req.body.usersDisliked); //undefined
-                    if (req.body.userId !== sauce.usersDisliked) {
-                        Sauce.updateOne({ _id: req.params.id }, {
-                            $inc: { dislikes: 1 }, //incrémente de 1 le nombre de dislikes
-                            $push: { usersDisliked: req.body.userId } //ajoute l'userId aux dislikes 
-                        })
-                            .then(() => res.status(200).json({ message: "L'utilisateur ajoute son dislike" }))
-                            .catch(error => res.status(400).json({ error }));
-                    }
-                });
+            Sauce.updateOne({ _id: req.params.id }, {
+                $inc: { dislikes: 1 }, //incrémente de 1 le nombre de dislikes
+                $push: { usersDisliked: req.body.userId } //ajoute l'userId aux dislikes 
+            })
+                .then(() => res.status(200).json({ message: "L'utilisateur ajoute son dislike" }))
+                .catch(error => res.status(400).json({ error }));
             break;
     }
 }
